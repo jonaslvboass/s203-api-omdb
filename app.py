@@ -15,9 +15,20 @@ app = Flask(__name__)
 def hello():
     return json.dumps({"msg":"Everything's fine!"})
 
-@app.route('/get_movie', methods=["GET"])
+@app.route('/get_movies', methods=["GET"])
 def get_movies():
-    title = request.args.get("title")
-    year = request.args.get("year")
-    movies = requests.get(f'http://www.omdbapi.com/?apikey='+API_KEY+'&t={title}&y={year}').json()
+    query = 'http://www.omdbapi.com/?apikey='+API_KEY
+    if 'title' in request.args:
+        title = request.args.get("title")
+        query += '&t='+title
+    else:
+        return json.dumps({"msg":"Need type something..."})
+    if 'year' in request.args:
+        year = request.args.get("year")
+        query += '&y='+year
+    if 'page' in request.args:
+        page = request.args.get("page")
+        query += '&page='+page
+    movies = requests.get(query).json()
+    movies["msg"] = "OK"
     return movies
